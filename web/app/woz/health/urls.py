@@ -1,5 +1,6 @@
 # Packages
 from django.conf.urls import url
+
 # Project
 from . import views
 

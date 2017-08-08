@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 
 urlpatterns = [
-    url(r'^status/', include('health.urls')),
+    url(r'^status/', include('woz.health.urls')),
 ]
 
 if settings.DEBUG:
