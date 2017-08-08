@@ -1,0 +1,13 @@
+Django
+django-cors-headers
+django-model-utils
+django-debug-toolbar
+django-extensions
+django-filter
+django-rest-swagger
+djangorestframework
+djangorestframework-gis
+drf-extensions
+drf-hal-json
+drf-nested-fields
+psycopg2

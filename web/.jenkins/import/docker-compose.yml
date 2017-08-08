@@ -1,0 +1,44 @@
+version: 3.0
+services:
+  database:
+    image: build.datapunt.amsterdam.nl:5000/atlas/postgres
+    environment:
+      POSTGRES_PASSWORD: insecure
+      POSTGRES_USER: woz
+
+  importer:
+    image: build.datapunt.amsterdam.nl:5000/datapunt/woz:${ENVIRONMENT}
+    links:
+      - database
+    environment:
+      WOZ_OBJECTSTORE_PASSWORD:
+      DATABASE_NAME: woz
+      DATABASE_USER: woz
+      DATABASE_PASSWORD: insecure
+      DATABASE_HOST_OVERRIDE: database
+      DATABASE_PORT_OVERRIDE: 5432
+      DATAPUNT_API_URL: ${DATAPUNT_API_URL:-https://api.data.amsterdam.nl/}
+
+    command: >
+      bash -c "/app/.jenkins/docker-wait.sh \
+              && python manage.py migrate \
+              && python manage.py run_import"
+
+  db-backup:
+    image: build.datapunt.amsterdam.nl:5000/atlas/postgres
+    links:
+      - database:db
+    volumes:
+      - ./backups:/tmp/backups
+    command: >
+      bash -c "echo db:5432:woz:woz:insecure > ~/.pgpass \
+              && chmod 600 ~/.pgpass \
+              && pg_dump --clean \
+                          -Fc \
+                          -t dataset* \
+                          -t geo*  \
+                          -t django_migrations  \
+                          -T auth*    \
+                          -U woz \
+                          -h db -p 5432 \
+                          woz > /tmp/backups/database.dump"
