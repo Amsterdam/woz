@@ -22,6 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY .jenkins/import /.jenkins-import/
 COPY .jenkins/docker-migrate.sh /app/
 
+# Tests
+COPY .jenkins /app/.jenkins/
+
 USER datapunt
 COPY app /app/
 
