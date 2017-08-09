@@ -17,8 +17,8 @@ services:
       - database:database
     environment:
       SECRET_KEY: insecure
-      DB_NAME: woz
-      DB_PASSWORD: insecure
+      DATABASE_NAME: woz
+      DATABASE_PASSWORD: insecure
       OBJECTSTORE_PASSWORD:
       UWSGI_HTTP: ":8000"
       UWSGI_MODULE: "woz.wsgi:application"

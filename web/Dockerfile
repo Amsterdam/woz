@@ -18,7 +18,10 @@ COPY .jenkins/docker-migrate.sh /app/
 # Tests
 COPY .jenkins /app/.jenkins/
 
-USER datapunt
+# Codebase
 COPY app /app/
 
-CMD /app/docker-entrypoint.sh
+USER datapunt
+RUN export DJANGO_SETTINGS_MODULE=monumenten.settings
+CMD uwsgi
+
