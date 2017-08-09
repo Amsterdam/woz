@@ -5,7 +5,9 @@ EXPOSE 8000
 
 RUN adduser --system datapunt \
     && mkdir -p /static \
-    && chown datapunt /static
+    && chown datapunt /static \
+    && mkdir -p  /app/data \
+    && chown datapunt  /app/data
 
 WORKDIR /app
 COPY requirements.txt /app/
@@ -22,6 +24,7 @@ COPY .jenkins /app/.jenkins/
 COPY app /app/
 
 USER datapunt
-RUN export DJANGO_SETTINGS_MODULE=monumenten.settings
+
+RUN export DJANGO_SETTINGS_MODULE=woz.settings
 CMD uwsgi
 

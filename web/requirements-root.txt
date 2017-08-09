@@ -11,3 +11,6 @@ drf-extensions
 drf-hal-json
 drf-nested-fields
 psycopg2
+python-dateutil
+python-keystoneclient
+python-swiftclient

@@ -10,6 +10,7 @@ from woz.settings_databases import Location_key, \
 
 INSTALLED_APPS += [
     'woz.health',
+    'woz.woz_commands',
 ]
 
 ROOT_URLCONF = 'woz.urls'
@@ -88,6 +89,11 @@ SWAGGER_SETTINGS = {
 }
 
 # HEALTH_MODEL = 'dataset.Woz'
+
+LOCAL_DATA_DIR = os.getenv('LOCAL_DATA_DIR', '/app/data')
+OBJECTSTORE_PASSWORD = os.getenv('BAG_OBJECTSTORE_PASSWORD', 'insecure')
+OBJECTSTORE_TENNANT = os.getenv('BAG_OBJECTSTORE_TENNANT_NAME', 'BGE000081_BAG')
+OBJECTSTORE_TENNANT_ID =  os.getenv('BAG_OBJECTSTORE_TENNANT_ID', '4f2f4b6342444c84b3580584587cfd18')
 
 DATAPUNT_AUTHZ = {
     'JWT_SECRET_KEY': os.getenv('JWT_SHARED_SECRET_KEY', 'insecureeeeeeeeeeeeeeeeeeeeeeeeeee'),

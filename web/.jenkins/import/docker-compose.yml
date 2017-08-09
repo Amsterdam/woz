@@ -11,7 +11,7 @@ services:
     links:
       - database
     environment:
-      WOZ_OBJECTSTORE_PASSWORD:
+      BAG_OBJECTSTORE_PASSWORD:
       DATABASE_NAME: woz
       DATABASE_USER: woz
       DATABASE_PASSWORD: insecure
