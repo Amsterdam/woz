@@ -14,3 +14,4 @@ psycopg2
 python-dateutil
 python-keystoneclient
 python-swiftclient
+sortedcontainers

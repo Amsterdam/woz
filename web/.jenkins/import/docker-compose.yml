@@ -22,7 +22,7 @@ services:
     command: >
       bash -c "/app/.jenkins/docker-wait.sh \
               && python manage.py migrate \
-              && python manage.py run_import"
+              && python manage.py import_woz"
 
   db-backup:
     image: build.datapunt.amsterdam.nl:5000/atlas/postgres
@@ -35,7 +35,7 @@ services:
               && chmod 600 ~/.pgpass \
               && pg_dump --clean \
                           -Fc \
-                          -t dataset* \
+                          -t wozdata* \
                           -t geo*  \
                           -t django_migrations  \
                           -T auth*    \

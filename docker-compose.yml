@@ -11,6 +11,8 @@ services:
 
   web:
     build: ./web
+    volumes:
+      - $PWD/web/fixtures/:/app/data/fixtures
     ports:
       - "8119:8000"
     links:
@@ -25,3 +27,5 @@ services:
       UWSGI_MASTER: 1
       UWSGI_STATIC_MAP: "/static=/static"
       UWSGI_DIE_ON_TERM: 1
+    command: >
+      bash -c "/app/.jenkins/docker-wait.sh && /app/docker-migrate.sh && uwsgi"

@@ -10,7 +10,7 @@ from woz.settings_databases import Location_key, \
 
 INSTALLED_APPS += [
     'woz.health',
-    'woz.woz_commands',
+    'woz.wozdata',
 ]
 
 ROOT_URLCONF = 'woz.urls'

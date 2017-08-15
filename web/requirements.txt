@@ -44,6 +44,7 @@ requests==2.18.3
 rfc3986==1.1.0
 simplejson==3.11.1
 six==1.10.0
+sortedcontainers==1.5.7
 sqlparse==0.2.3
 stevedore==1.25.0
 uritemplate==3.0.0
