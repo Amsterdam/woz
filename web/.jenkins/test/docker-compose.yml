@@ -10,7 +10,7 @@ services:
   tests:
     build: ../../
     volumes:
-      - $PWD/../../fixtures/:/app/data/fixtures
+      - ../../fixtures/:/app/data/fixtures
     links:
       - database
     environment:
