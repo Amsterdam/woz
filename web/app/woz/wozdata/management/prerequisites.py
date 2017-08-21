@@ -10,7 +10,7 @@ class WaitForFilledTable(object):
     def __init__(self, tablename):
         self.tablename = tablename
 
-    def __enter__(self, tablename):
+    def __enter__(self):
         while True:
             log.warning(f"waiting for {self.tablename} table...")
             time.sleep(10)
