@@ -10,26 +10,33 @@ build_web:
   stage: build
   script:
   - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8} ./web
-  - docker push ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8}
+  - docker build --pull -t ${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA:0:8} ./web
+  - docker push ${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA:0:8}
 
 build_database:
   stage: build
   script:
   - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8} ./database
-  - docker push ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8}
+  - docker build --pull -t ${CI_REGISTRY_IMAGE}/database:${CI_COMMIT_SHA:0:8} ./database
+  - docker push ${CI_REGISTRY_IMAGE}/database:${CI_COMMIT_SHA:0:8}
 
-push:
+push_web:
   stage: push
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker pull ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_IMAGE}_web:acceptance
-    - docker push ${DEPLOYMENT_IMAGE}_web:acceptance
-    - docker pull ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_IMAGE}_database:acceptance
-    - docker push ${DEPLOYMENT_IMAGE}_database:acceptance
+    - docker pull ${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA:0:8}
+    - docker tag ${CI_REGISTRY_IMAGE}/web:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_IMAGE}/web:acceptance
+    - docker push ${DEPLOYMENT_IMAGE}/web:acceptance
+  only:
+    - master
+
+push_database:
+  stage: push
+  script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker pull ${CI_REGISTRY_IMAGE}/database:${CI_COMMIT_SHA:0:8}
+    - docker tag ${CI_REGISTRY_IMAGE}/database:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_IMAGE}/database:acceptance
+    - docker push ${DEPLOYMENT_IMAGE}/database:acceptance
   only:
     - master
 
@@ -41,7 +48,20 @@ deploy_acceptance:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}:acceptance
+    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}/web:acceptance
+  only:
+    - master
+
+deploy_acceptance_database:
+  stage: deploy
+  when: manual
+  environment:
+    name: acceptance
+    url: https://api.acc.amsterdam.nl/woz
+
+  image: cdrx/rancher-gitlab-deploy:latest
+  script:
+    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}/database:acceptance
   only:
     - master
 
@@ -54,6 +74,19 @@ deploy_prod:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}
+    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}/web
+  only:
+    - master
+
+deploy_prod_database:
+  stage: deploy
+  when: manual
+  environment:
+    name: production
+    url: https://api.amsterdam.nl/woz
+
+  image: cdrx/rancher-gitlab-deploy:latest
+  script:
+    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}/database
   only:
     - master
