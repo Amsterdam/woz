@@ -13,7 +13,7 @@ class WaitForFilledTable(object):
     def __enter__(self):
         while True:
             log.warning(f"waiting for {self.tablename} table...")
-            time.sleep(10)
+            time.sleep(30)
             if self.is_table_present is True:
                 log.warning(f"done... waiting for {self.tablename} table")
                 break
@@ -43,7 +43,6 @@ def fill_referentiedata():
 INSERT INTO wozdata_nummeraanduidinggebruiksdoel (nummeraanduiding, code, omschrijving)
     SELECT id as nummeraanduiding, code, omschrijving
     FROM nummeraanduiding_gebruiksdoelen
-    WHERE code like '10%';
             """)
             return bool(cursor.rowcount)
     except Exception as e:

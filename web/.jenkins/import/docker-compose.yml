@@ -18,7 +18,6 @@ services:
       DATABASE_HOST_OVERRIDE: database
       DATABASE_PORT_OVERRIDE: 5432
       DATAPUNT_API_URL: ${DATAPUNT_API_URL:-https://api.data.amsterdam.nl/}
-
     command: >
       bash -c "/app/.jenkins/docker-wait.sh \
               && python manage.py migrate \

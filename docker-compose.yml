@@ -1,9 +1,7 @@
 version: "3.0"
 services:
   database:
-    image: build.datapunt.amsterdam.nl:5000/atlas/postgres
-    ports:
-      - "5459:5432"
+    build: ./database
     environment:
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: woz
@@ -21,7 +19,6 @@ services:
       SECRET_KEY: insecure
       DATABASE_NAME: woz
       DATABASE_PASSWORD: insecure
-      BAG_OBJECTSTORE_PASSWORD:
       UWSGI_HTTP: ":8000"
       UWSGI_MODULE: "woz.wsgi:application"
       UWSGI_MASTER: 1
