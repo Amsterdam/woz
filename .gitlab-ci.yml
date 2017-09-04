@@ -2,7 +2,6 @@ stages:
   - build
   - push
   - deploy
-  - database
 
 variables:
   DEPLOYMENT_IMAGE: ${CI_REGISTRY_IMAGE}

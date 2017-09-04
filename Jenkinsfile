@@ -55,44 +55,49 @@ if (BRANCH == "master") {
         }
     }
 
-    node {
-        stage("Deploy to ACC") {
-            tryStep "deployment", {
-                build job: 'Subtask_Openstack_Playbook',
-                parameters: [
-                    [$class: 'StringParameterValue', name: 'INVENTORY', value: 'acceptance'],
-                    [$class: 'StringParameterValue', name: 'PLAYBOOK', value: 'deploy-woz.yml'],
-                ]
-            }
-        }
-    }
-
-
-    stage('Waiting for approval') {
-        slackSend channel: '#ci-channel', color: 'warning', message: 'WOZ-API is waiting for Production Release - please confirm'
-        input "Deploy to Production?"
-    }
-
-    node {
-        stage('Push production image') {
-            tryStep "image tagging", {
-                def image = docker.image("build.datapunt.amsterdam.nl:5000/datapunt/woz:${env.BUILD_NUMBER}")
-                image.pull()
-                image.push("production")
-                image.push("latest")
-            }
-        }
-    }
-
-    node {
-        stage("Deploy") {
-            tryStep "deployment", {
-                build job: 'Subtask_Openstack_Playbook',
-                parameters: [
-                    [$class: 'StringParameterValue', name: 'INVENTORY', value: 'production'],
-                    [$class: 'StringParameterValue', name: 'PLAYBOOK', value: 'deploy-woz.yml'],
-                ]
-            }
-        }
-    }
+//
+//      /* Disabled on api.data.amsterdam.nl WOZ is being run from api.secure.amsterdam.nl  */
+//
+//    node {
+//        stage("Deploy to ACC") {
+//            tryStep "deployment", {
+//                build job: 'Subtask_Openstack_Playbook',
+//                parameters: [
+//                    [$class: 'StringParameterValue', name: 'INVENTORY', value: 'acceptance'],
+//                    [$class: 'StringParameterValue', name: 'PLAYBOOK', value: 'deploy-woz.yml'],
+//                ]
+//            }
+//        }
+//    }
+//
+//    stage('Waiting for approval') {
+//        slackSend channel: '#ci-channel', color: 'warning', message: 'WOZ-API is waiting for Production Release - please confirm'
+//        input "Deploy to Production?"
+//    }
+//
+//    node {
+//        stage('Push production image') {
+//            tryStep "image tagging", {
+//                def image = docker.image("build.datapunt.amsterdam.nl:5000/datapunt/woz:${env.BUILD_NUMBER}")
+//                image.pull()
+//                image.push("production")
+//                image.push("latest")
+//            }
+//       }
+//    }
+//
+//
+//      /* Disabled. WOZ is being run from api.secure.amsterdam.nl  */
+//
+//    node {
+//        stage("Deploy") {
+//            tryStep "deployment", {
+//                build job: 'Subtask_Openstack_Playbook',
+//                parameters: [
+//                    [$class: 'StringParameterValue', name: 'INVENTORY', value: 'production'],
+//                    [$class: 'StringParameterValue', name: 'PLAYBOOK', value: 'deploy-woz.yml'],
+//                ]
+//            }
+//        }
+//    }
 }
