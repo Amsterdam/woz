@@ -2,6 +2,7 @@ stages:
   - build
   - push
   - deploy
+  - database
 
 variables:
   DEPLOYMENT_IMAGE: ${CI_REGISTRY_IMAGE}
@@ -48,7 +49,7 @@ deploy_acceptance:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}/web:acceptance
+    - upgrade --stack WozApiStack --service web --new-image ${DEPLOYMENT_IMAGE}/web:acceptance
   only:
     - master
 
@@ -61,7 +62,7 @@ deploy_acceptance_database:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}/database:acceptance
+    - upgrade --stack WozApiStack --service database --new-image ${DEPLOYMENT_IMAGE}/database:acceptance
   only:
     - master
 
@@ -74,7 +75,7 @@ deploy_prod:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}/web
+    - upgrade --stack WozApiStack --service web --new-image ${CONTAINER_IMAGE}/web
   only:
     - master
 
@@ -87,6 +88,6 @@ deploy_prod_database:
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
-    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}/database
+    - upgrade --stack WozApiStack --service database --new-image ${CONTAINER_IMAGE}/database
   only:
     - master
