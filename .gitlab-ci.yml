@@ -1,0 +1,56 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy
+
+variables:
+  DEPLOYMENT_IMAGE: ${CI_REGISTRY_IMAGE}
+
+build:
+  stage: build
+  script:
+  - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  - docker build --pull -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} .
+  - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8}
+
+test:
+  stage: test
+  script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker run --rm ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ./manage.py test
+
+push:
+  stage: push
+  script:
+    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8}
+    - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_IMAGE}:acceptance
+    - docker push ${DEPLOYMENT_IMAGE}:acceptance
+  only:
+    - master
+
+deploy_acceptance:
+  stage: deploy
+  environment:
+    name: acceptance
+    url: https://api.acc.amsterdam.nl/woz
+
+  image: cdrx/rancher-gitlab-deploy:latest
+  script:
+    - upgrade --stack WozApiStack --service WozApi --new-image ${DEPLOYMENT_IMAGE}:acceptance
+  only:
+    - master
+
+deploy_prod:
+  stage: deploy
+  when: manual
+  environment:
+    name: production
+    url: https://api.amsterdam.nl/woz
+
+  image: cdrx/rancher-gitlab-deploy:latest
+  script:
+    - upgrade --stack WozApiStack --service WozApi --new-image ${CONTAINER_IMAGE}
+  only:
+    - master
