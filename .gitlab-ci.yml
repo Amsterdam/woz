@@ -1,27 +1,24 @@
 stages:
   - build
-#  - test
   - push
   - deploy
 
 variables:
   DEPLOYMENT_IMAGE: ${CI_REGISTRY_IMAGE}
 
-build:
+build_web:
   stage: build
   script:
   - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ./web
+  - docker build --pull -t ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8} ./web
   - docker push ${CI_REGISTRY_IMAGE}_web:${CI_COMMIT_SHA:0:8}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ./database
-  - docker push ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8}
 
-#  We run tests in Datapunt jenkins pipeline
-#test:
-#  stage: test
-#  script:
-#    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-#    - docker run --rm ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA:0:8} ./manage.py test
+build_database:
+  stage: build
+  script:
+  - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  - docker build --pull -t ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8} ./database
+  - docker push ${CI_REGISTRY_IMAGE}_database:${CI_COMMIT_SHA:0:8}
 
 push:
   stage: push
