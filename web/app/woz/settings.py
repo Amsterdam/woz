@@ -49,7 +49,7 @@ DATABASES = {
 }
 
 # SWAGGER
-SWAG_PATH = 'acc.api.data.amsterdam.nl/woz/docs'
+SWAG_PATH = 'acc.api.secure.amsterdam.nl/woz/docs'
 
 if DEBUG:
     SWAG_PATH = '127.0.0.1:8000/woz/docs'

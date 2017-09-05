@@ -57,6 +57,7 @@ if (BRANCH == "master") {
 
 //
 //      /* Disabled on api.data.amsterdam.nl WOZ is being run from api.secure.amsterdam.nl  */
+//      /* Tests, however, are run on jenkins', not gitlab's pipeline */
 //
 //    node {
 //        stage("Deploy to ACC") {
