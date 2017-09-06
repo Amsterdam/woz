@@ -7,7 +7,7 @@ from woz.api.views import WaardeView
 waarde_view = WaardeView.as_view()
 
 urlpatterns = [
-    url(r'^woz/', waarde_view, name='waarde'),
+    url(r'^woz/waarde/', waarde_view, name='waarde'),
     url(r'^status/', include('woz.health.urls')),
 ]
 
