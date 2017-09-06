@@ -100,7 +100,7 @@ class WOZWaardeBeschikking(models.Model):
 
 class NummeraanduidingGebruiksdoel(models.Model):
     id = models.AutoField(primary_key=True)
-    nummeraanduiding = models.CharField(max_length=14, db_index=True)
+    nummeraanduiding = models.CharField(max_length=16, db_index=True)
     code = models.CharField(max_length=4)
     omschrijving = models.CharField(max_length=50)
 
