@@ -74,7 +74,7 @@ def _to_null_or_integer(column):
 _unique_pks = SortedList()
 
 
-def _process_woz_object_row(row, _pks):
+def _process_woz_object_row(row):
     try:
         pk = row['WOZ_objectnummer']
     except KeyError:
