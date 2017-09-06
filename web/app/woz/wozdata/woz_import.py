@@ -32,7 +32,7 @@ def _get_encoding(filename):
     return detector.result['encoding']
 
 
-def _process_csv(csv_file_identification, data_dir, data_object, process_row_callback, *args):
+def _process_csv(csv_file_identification, data_dir, data_object, process_row_callback):
     data_file = _get_csv_file(csv_file_identification, data_dir)
     inferred_encoding = _get_encoding(data_file)
     with open(data_file, "r", encoding=inferred_encoding) as csv_file:
@@ -70,18 +70,20 @@ def _to_null_or_integer(column):
     else:
         return int(column)
 
+# global list of pks to prevent double entries in woz_object
+_unique_pks = SortedList()
 
-_pks = SortedList()
-def _process_woz_object_row(row):
+
+def _process_woz_object_row(row, _pks):
     try:
         pk = row['WOZ_objectnummer']
     except KeyError:
         return None
-    if pk in _pks:
+    if pk in _unique_pks:
         log.info(f"ignoring doublure WOZ objectnummer: {pk}")
         return None
     else:
-        _pks.add(pk)
+        _unique_pks.add(pk)
 
     return models.WOZObject(
         woz_objectnummer=pk,
