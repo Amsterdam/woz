@@ -27,7 +27,7 @@ deploy_acceptance:
   stage: deploy
   environment:
     name: acceptance
-    url: https://api.acc.amsterdam.nl/woz
+    url: https://acc.api.secure.amsterdam.nl/woz
 
   image: cdrx/rancher-gitlab-deploy:latest
   script:
