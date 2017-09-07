@@ -45,6 +45,14 @@ class TestWaardeView(APITestCase):
         models.WOZObject.objects.all().delete()
         super().tearDownClass()
 
+    def test_get_no_paramater(self):
+        response = self.client.get('/woz/waarde/')
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_wrong_paramater(self):
+        response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 09256 A')
+        self.assertEqual(response.status_code, 400)
+
     def test_get_non_existent_kadastraal_object(self):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 09256 A 0003')
         self.assertEqual(response.status_code, 200)

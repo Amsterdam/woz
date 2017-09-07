@@ -5,6 +5,7 @@ import logging
 from rest_framework import views
 from rest_framework.response import Response
 from woz.wozdata import models
+from rest_framework import status
 
 GEBRUIKDSOEL_WONING_CODE = '1000'
 RESTRICTED_YEARS = (2014, 2015)
@@ -23,14 +24,18 @@ class WaardeView(views.APIView):
      """
 
     def get(self, request, *args, **kwargs):
+        if 'kadastraal_object' not in request.query_params:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         kadastraal_object = request.query_params['kadastraal_object']
-        if kadastraal_object is None:
-            return Response([])
         kadastrale_identificatie = str.split(kadastraal_object)
 
-        response = []
+        try:
+            woz_objecten = self._get_woz_woningen_from(kadastrale_identificatie)
+        except IndexError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        woz_objecten = self._get_woz_woningen_from(kadastrale_identificatie)
+        response = []
         for woz_object in woz_objecten:
             waardebeschikkingen = models.WOZWaardeBeschikking.objects.filter(
                 woz_object=woz_object.woz_objectnummer
