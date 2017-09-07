@@ -32,6 +32,10 @@ def _get_encoding(filename):
     return detector.result['encoding']
 
 
+# global list of pks to prevent double entries in woz_object
+_unique_pks = SortedList()
+
+
 def _process_csv(csv_file_identification, data_dir, data_object, process_row_callback):
     data_file = _get_csv_file(csv_file_identification, data_dir)
     inferred_encoding = _get_encoding(data_file)
@@ -44,6 +48,7 @@ def _process_csv(csv_file_identification, data_dir, data_object, process_row_cal
         headers = next(rows)
 
         models = []
+        _unique_pks.clear()
         for row in rows:
             model_data = dict(zip(headers, row))
             model = process_row_callback(model_data)
@@ -69,9 +74,6 @@ def _to_null_or_integer(column):
         return None
     else:
         return int(column)
-
-# global list of pks to prevent double entries in woz_object
-_unique_pks = SortedList()
 
 
 def _process_woz_object_row(row):

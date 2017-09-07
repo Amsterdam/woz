@@ -12,15 +12,14 @@ RESTRICTED_YEARS = (2014, 2015)
 log = logging.getLogger(__name__)
 
 
-
 class WaardeView(views.APIView):
     """
         kadastraal_object: ASD15 S 09256 A 0002
 
-        retourneert de WOZ waarde in RESTRICTED YEARS indien kadastraal object bestaat in WOZ data
+        retourneert de WOZ waarde in RESTRICTED_YEARS indien kadastraal object bestaat in WOZ data
         en één van de gebruiksdoelen van het verblijfsobject bij de nummeraanduiding van het WOZ
-        object een woning is. Als waarde geldt die, die het meest recent (naar
-        begindatum_beschikking_object) is vastgesteld
+        object een woning is. Als waarde geldt die, die het meest recent (conform
+        begindatum_beschikking_object) is vastgesteld.
      """
 
     def get(self, request, *args, **kwargs):
