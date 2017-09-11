@@ -63,8 +63,8 @@ class TestWaardeView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(1, len(response.data))
         self.assertEqual('036398765431', response.data[0]['woz_object'])
-        self.assertEqual(159000, response.data[0]['waarden'][2014])
-        self.assertEqual(166000, response.data[0]['waarden'][2015])
+        self.assertEqual(166000, response.data[0]['waarden'][2014])
+        self.assertEqual(181000, response.data[0]['waarden'][2015])
         log.warning(f"1: {response.data}")
 
     def test_get_kadastraal_object2(self):
@@ -72,8 +72,8 @@ class TestWaardeView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(1, len(response.data))
         self.assertEqual('036398765431', response.data[0]['woz_object'])
-        self.assertEqual(159000, response.data[0]['waarden'][2014])
-        self.assertEqual(166000, response.data[0]['waarden'][2015])
+        self.assertEqual(166000, response.data[0]['waarden'][2014])
+        self.assertEqual(181000, response.data[0]['waarden'][2015])
         log.warning(f"2: {response.data}")
 
     def test_get_kadastraal_object_new_price(self):
@@ -81,8 +81,8 @@ class TestWaardeView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(1, len(response.data))
         self.assertEqual('036398765432', response.data[0]['woz_object'])
-        self.assertEqual(158000, response.data[0]['waarden'][2014])
-        self.assertEqual(167000, response.data[0]['waarden'][2015])
+        self.assertEqual(167000, response.data[0]['waarden'][2014])
+        self.assertEqual(179000, response.data[0]['waarden'][2015])
         log.warning(f"3: {response.data}")
 
     def test_get_kadastraal_object_multiple_woz_objects(self):
@@ -90,11 +90,11 @@ class TestWaardeView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(2, len(response.data))
         self.assertEqual('036398765433', response.data[0]['woz_object'])
-        self.assertEqual(293500, response.data[0]['waarden'][2014])
-        self.assertEqual(294500, response.data[0]['waarden'][2015])
+        self.assertEqual(294500, response.data[0]['waarden'][2014])
+        self.assertEqual(236500, response.data[0]['waarden'][2015])
         self.assertEqual('036398765434', response.data[1]['woz_object'])
-        self.assertEqual(283500, response.data[1]['waarden'][2014])
-        self.assertEqual(285500, response.data[1]['waarden'][2015])
+        self.assertEqual(285500, response.data[1]['waarden'][2014])
+        self.assertEqual(229500, response.data[1]['waarden'][2015])
         log.warning(f"5: {response.data}")
 
     def test_get_non_woonfunctie_kadastraal_object6(self):
