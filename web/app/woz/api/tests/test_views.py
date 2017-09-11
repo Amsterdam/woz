@@ -36,15 +36,6 @@ class TestWaardeView(APITestCase):
             nummeraanduiding='0363200000137332',
             code='1400').save()
 
-    @classmethod
-    def tearDownClass(cls):
-        models.NummeraanduidingGebruiksdoel.objects.all().delete()
-        models.WOZWaardeBeschikking.objects.all().delete()
-        models.WOZDeelObject.objects.all().delete()
-        models.WOZKadastraalObject.objects.all().delete()
-        models.WOZObject.objects.all().delete()
-        super().tearDownClass()
-
     def test_get_no_paramater(self):
         response = self.client.get('/woz/waarde/')
         self.assertEqual(response.status_code, 400)
@@ -65,7 +56,6 @@ class TestWaardeView(APITestCase):
         self.assertEqual('036398765431', response.data[0]['woz_object'])
         self.assertEqual(166000, response.data[0]['waarden'][2014])
         self.assertEqual(181000, response.data[0]['waarden'][2015])
-        log.warning(f"1: {response.data}")
 
     def test_get_kadastraal_object2(self):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 09256 A 0093')
@@ -74,7 +64,6 @@ class TestWaardeView(APITestCase):
         self.assertEqual('036398765431', response.data[0]['woz_object'])
         self.assertEqual(166000, response.data[0]['waarden'][2014])
         self.assertEqual(181000, response.data[0]['waarden'][2015])
-        log.warning(f"2: {response.data}")
 
     def test_get_kadastraal_object_new_price(self):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 09256 A 0013')
@@ -83,7 +72,6 @@ class TestWaardeView(APITestCase):
         self.assertEqual('036398765432', response.data[0]['woz_object'])
         self.assertEqual(167000, response.data[0]['waarden'][2014])
         self.assertEqual(179000, response.data[0]['waarden'][2015])
-        log.warning(f"3: {response.data}")
 
     def test_get_kadastraal_object_multiple_woz_objects(self):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 04638 G 0000')
@@ -95,11 +83,8 @@ class TestWaardeView(APITestCase):
         self.assertEqual('036398765434', response.data[1]['woz_object'])
         self.assertEqual(285500, response.data[1]['waarden'][2014])
         self.assertEqual(229500, response.data[1]['waarden'][2015])
-        log.warning(f"5: {response.data}")
 
     def test_get_non_woonfunctie_kadastraal_object6(self):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 04639 G 0000')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(0, len(response.data))
-
-
