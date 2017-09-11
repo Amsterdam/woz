@@ -42,7 +42,7 @@ class WaardeView(views.APIView):
             ).extra(order_by = ['begindatum_beschikking_object']).all()
             waarden = {}
             for waardebeschikking in waardebeschikkingen:
-                waarden[waardebeschikking.begindatum_waarde] = waardebeschikking.vastgestelde_waarde
+                waarden[waardebeschikking.waardepeildatum] = waardebeschikking.vastgestelde_waarde
             output_waarden = {key.year:value for key, value in waarden.items() if key.year in RESTRICTED_YEARS}
             response.append({
                 'woz_object': woz_object.woz_objectnummer,
