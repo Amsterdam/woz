@@ -3,7 +3,6 @@ import glob
 import logging
 from datetime import datetime
 
-from sortedcontainers import SortedList
 from chardet.universaldetector import UniversalDetector
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -33,7 +32,7 @@ def _get_encoding(filename):
 
 
 # global list of pks to prevent double entries in woz_object
-_unique_pks = SortedList()
+_unique_pks = set()
 
 
 def _process_csv(csv_file_identification, data_dir, data_object, process_row_callback):
