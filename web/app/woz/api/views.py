@@ -19,8 +19,8 @@ class WaardeView(views.APIView):
 
         retourneert de WOZ waarde in RESTRICTED_YEARS indien kadastraal object bestaat in WOZ data
         en één van de gebruiksdoelen van het verblijfsobject bij de nummeraanduiding van het WOZ
-        object een woning is. Als waarde geldt die, die het meest recent (conform
-        begindatum_beschikking_object) is vastgesteld.
+        object een woning is. Als waarde voor de waardepeildatum geldt die, die het meest recent
+        (volgens begindatum_beschikking_object) voor die waardepeildatum is vastgesteld.
      """
 
     def get(self, request, *args, **kwargs):
@@ -35,7 +35,7 @@ class WaardeView(views.APIView):
         except IndexError:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        response = []
+        woz_waarden = []
         for woz_object in woz_objecten:
             waardebeschikkingen = models.WOZWaardeBeschikking.objects.filter(
                 woz_object=woz_object.woz_objectnummer
@@ -44,11 +44,12 @@ class WaardeView(views.APIView):
             for waardebeschikking in waardebeschikkingen:
                 waarden[waardebeschikking.waardepeildatum] = waardebeschikking.vastgestelde_waarde
             output_waarden = {key.year:value for key, value in waarden.items() if key.year in RESTRICTED_YEARS}
-            response.append({
+            woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
                 'waarden': output_waarden
             })
 
+        response = {'kadastraal_object': kadastraal_object, 'woz_waarden': woz_waarden}
         return Response(response)
 
 
