@@ -19,6 +19,12 @@ def _get_csv_file(csv_file_identification, data_dir):
     return data_file_candidates[0]
 
 
+"""
+    aangeleverde bestanden blijken niet UTF-8 te zijn, en er is niet aangegeven wat wel
+    het import-proces faalde op de aanname dat de bestanden UTF-8 zijn, voor 1 van de 4
+    bestanden. Om het import proces zekerder te maken gebruik ik chardet om de encoding
+    van de files te detecteren
+"""
 def _get_encoding(filename):
     log.info(f"trying to detect file encoding of {filename}")
     detector = UniversalDetector()
@@ -35,32 +41,34 @@ def _get_encoding(filename):
 _unique_pks = set()
 
 
-def _process_csv(csv_file_identification, data_dir, data_object, process_row_callback):
+def _process_csv(csv_file_identification, data_dir, process_row_callback):
     data_file = _get_csv_file(csv_file_identification, data_dir)
     inferred_encoding = _get_encoding(data_file)
     with open(data_file, "r", encoding=inferred_encoding) as csv_file:
         csv_file_iterator = iter(csv_file.read().split('\n'))
-        rows = csv.reader(csv_file_iterator,
-                          delimiter=';',
-                          quotechar=None,
-                          quoting=csv.QUOTE_NONE)
-        headers = next(rows)
 
-        models = []
-        _unique_pks.clear()
-        for row in rows:
-            model_data = dict(zip(headers, row))
-            model = process_row_callback(model_data)
-            if model:
-                models.append(model)
-            if len(models) == BATCH_SIZE:
-                data_object.objects.bulk_create(models, batch_size=BATCH_SIZE)
-                models.clear()
+    rows = csv.reader(csv_file_iterator,
+                      delimiter=';',
+                      quotechar=None,
+                      quoting=csv.QUOTE_NONE)
+    headers = next(rows)
 
-        data_object.objects.bulk_create(models, batch_size=BATCH_SIZE)
+    models = []
+    _unique_pks.clear()
+    for row in rows:
+        model_data = dict(zip(headers, row))
+        model = process_row_callback(model_data)
+        if model:
+            models.append(model)
+        if len(models) == BATCH_SIZE:
+            type(models[-1]).objects.bulk_create(models, batch_size=BATCH_SIZE)
+            models.clear()
+
+    if len(models) > 0:
+        type(models[-1]).objects.bulk_create(models, batch_size=BATCH_SIZE)
 
 
-def _to_null_or_date(column):
+def _to_none_or_date(column):
     if len(column) == 0:
         return None
     if len(column) > 13:
@@ -68,7 +76,7 @@ def _to_null_or_date(column):
     return datetime.strptime(column, '%d-%m-%Y').date()
 
 
-def _to_null_or_integer(column):
+def _to_none_or_integer(column):
     if len(column) == 0 or column == '-':
         return None
     else:
@@ -89,8 +97,8 @@ def _process_woz_object_row(row):
     return models.WOZObject(
         woz_objectnummer=pk,
         volgnummer=row['Volgnummer'],
-        begindatum_wozobject=_to_null_or_date(row['Begindatum_wozobject']),
-        begindatum_voorkomen=_to_null_or_date(row['Begindatum_voorkomen']),
+        begindatum_wozobject=_to_none_or_date(row['Begindatum_wozobject']),
+        begindatum_voorkomen=_to_none_or_date(row['Begindatum_voorkomen']),
         status=row['Status'],
         gebruikscode=row['Gebruikscode'],
         soort_objectcode=row['Soort_objectcode'],
@@ -135,14 +143,14 @@ def _process_woz_deelobject_row(row):
     return models.WOZDeelObject(
         woz_object=woz_object,
         volgnummer=row['Volgnummer'],
-        begindatum_deelobject=_to_null_or_date(row['Begindatum_deelobject']),
-        begindatum_voorkomen=_to_null_or_date(row['Begindatum_voorkomen']),
+        begindatum_deelobject=_to_none_or_date(row['Begindatum_deelobject']),
+        begindatum_voorkomen=_to_none_or_date(row['Begindatum_voorkomen']),
         code=row['Code'],
         status=row['Status'],
-        bouwjaar=_to_null_or_integer(row['Bouwjaar']),
-        bouwlaag=_to_null_or_integer(row['Bouwlaag']),
-        renovatiejaar=_to_null_or_integer(row['Renovatiejaar']),
-        oppervlakte=_to_null_or_integer(row['Oppervlakte'])
+        bouwjaar=_to_none_or_integer(row['Bouwjaar']),
+        bouwlaag=_to_none_or_integer(row['Bouwlaag']),
+        renovatiejaar=_to_none_or_integer(row['Renovatiejaar']),
+        oppervlakte=_to_none_or_integer(row['Oppervlakte'])
     )
 
 
@@ -153,17 +161,17 @@ def _process_woz_kadastraalobject_row(row):
 
     return models.WOZKadastraalObject(
         woz_object=woz_object,
-        begindatum_relatie_wozobject=_to_null_or_date(row['Begindatum_relatie_wozobject']),
-        begindatum_relatie_voorkomen=_to_null_or_date(row['Begindatum_relatie_voorkomen']),
+        begindatum_relatie_wozobject=_to_none_or_date(row['Begindatum_relatie_wozobject']),
+        begindatum_relatie_voorkomen=_to_none_or_date(row['Begindatum_relatie_voorkomen']),
         kadastraal_object_identificatie=row['Kadastraal_object_identificatie'],
         kadastrale_gemeentecode=row['Kadastrale_gemeentecode'],
         sectie=row['Sectie'],
         perceelnummer=row['Perceelnummer'],
         indexletter=row['Indexletter'],
         indexnummer=row['Indexnummer'],
-        grootte=_to_null_or_integer(row['Grootte']),
-        toegekende_oppervlakte=_to_null_or_integer(row['Toegekende_oppervlakte']),
-        meegetaxeerde_oppervlakte=_to_null_or_integer(row['Meegetaxeerde_oppervlakte'])
+        grootte=_to_none_or_integer(row['Grootte']),
+        toegekende_oppervlakte=_to_none_or_integer(row['Toegekende_oppervlakte']),
+        meegetaxeerde_oppervlakte=_to_none_or_integer(row['Meegetaxeerde_oppervlakte'])
     )
 
 
@@ -174,22 +182,22 @@ def _process_woz_waardebeschikking_row(row):
 
     return models.WOZWaardeBeschikking(
         woz_object=woz_object,
-        begindatum_waarde_object=_to_null_or_date(row['Begindatum_waarde_object']),
-        einddatum_waarde_object=_to_null_or_date(row['Einddatum_waarde_object']),
-        begindatum_waarde_voorkomen=_to_null_or_date(row['Begindatum_waarde_voorkomen']),
+        begindatum_waarde_object=_to_none_or_date(row['Begindatum_waarde_object']),
+        einddatum_waarde_object=_to_none_or_date(row['Einddatum_waarde_object']),
+        begindatum_waarde_voorkomen=_to_none_or_date(row['Begindatum_waarde_voorkomen']),
         vastgestelde_waarde=row['Vastgestelde_waarde'],
-        waardepeildatum=_to_null_or_date(row['Waardepeildatum']),
-        begindatum_waarde=_to_null_or_date(row['Begindatum_waarde']),
-        begindatum_beschikking_object=_to_null_or_date(row['Begindatum_beschikking_object']),
-        einddatum_beschikking_object=_to_null_or_date(row['Einddatum_beschikking_object']),
-        begindatum_beschikking_voorkomen=_to_null_or_date(row['Begindatum_beschikking_voorkomen']),
+        waardepeildatum=_to_none_or_date(row['Waardepeildatum']),
+        begindatum_waarde=_to_none_or_date(row['Begindatum_waarde']),
+        begindatum_beschikking_object=_to_none_or_date(row['Begindatum_beschikking_object']),
+        einddatum_beschikking_object=_to_none_or_date(row['Einddatum_beschikking_object']),
+        begindatum_beschikking_voorkomen=_to_none_or_date(row['Begindatum_beschikking_voorkomen']),
         documentnummer_beschikking=row['Documentnummer_beschikking'],
         status_beschikking=row['Status_beschikking']
     )
 
 
 def import_woz_files(data_dir):
-    _process_csv('WOZ_wozobject_eigenaar_', data_dir, models.WOZObject, _process_woz_object_row)
-    _process_csv('WOZ_wozdeelobject_', data_dir, models.WOZDeelObject, _process_woz_deelobject_row)
-    _process_csv('WOZ_kadastraalobject_', data_dir, models.WOZKadastraalObject, _process_woz_kadastraalobject_row)
-    _process_csv('WOZ_waarde_beschikking_', data_dir, models.WOZWaardeBeschikking, _process_woz_waardebeschikking_row)
+    _process_csv('WOZ_wozobject_eigenaar_', data_dir, _process_woz_object_row)
+    _process_csv('WOZ_wozdeelobject_', data_dir, _process_woz_deelobject_row)
+    _process_csv('WOZ_kadastraalobject_', data_dir, _process_woz_kadastraalobject_row)
+    _process_csv('WOZ_waarde_beschikking_', data_dir, _process_woz_waardebeschikking_row)
