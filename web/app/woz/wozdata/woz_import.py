@@ -85,6 +85,7 @@ def _to_none_or_integer(column):
 
 
 def _process_woz_object_row(row):
+    """ guard against empty rows, ignoring them """
     try:
         pk = row['WOZ_objectnummer']
     except KeyError:
@@ -125,6 +126,7 @@ def _process_woz_object_row(row):
 
 
 def _get_parent_woz_object(row, type):
+    """ guard against empty rows, ignoring them """
     try:
         fk = row['WOZ_objectnummer']
     except KeyError:
