@@ -44,28 +44,26 @@ _unique_pks = set()
 def _process_csv(csv_file_identification, data_dir, process_row_callback):
     data_file = _get_csv_file(csv_file_identification, data_dir)
     inferred_encoding = _get_encoding(data_file)
+
     with open(data_file, "r", encoding=inferred_encoding) as csv_file:
-        csv_file_iterator = iter(csv_file.read().split('\n'))
+        rows = csv.reader(csv_file, delimiter=';', quotechar=None, quoting=csv.QUOTE_NONE)
+        headers = next(rows)
 
-    rows = csv.reader(csv_file_iterator,
-                      delimiter=';',
-                      quotechar=None,
-                      quoting=csv.QUOTE_NONE)
-    headers = next(rows)
+        models = []
+        _unique_pks.clear()
+        for row in rows:
+            model_data = dict(zip(headers, row))
+            model = process_row_callback(model_data)
+            if model:
+                models.append(model)
 
-    models = []
-    _unique_pks.clear()
-    for row in rows:
-        model_data = dict(zip(headers, row))
-        model = process_row_callback(model_data)
-        if model:
-            models.append(model)
-        if len(models) == BATCH_SIZE:
+            if len(models) == BATCH_SIZE:
+                model_object = type(models[-1])
+                model_object.objects.bulk_create(models, batch_size=BATCH_SIZE)
+                models.clear()
+
+        if len(models) > 0:
             type(models[-1]).objects.bulk_create(models, batch_size=BATCH_SIZE)
-            models.clear()
-
-    if len(models) > 0:
-        type(models[-1]).objects.bulk_create(models, batch_size=BATCH_SIZE)
 
 
 def _to_none_or_date(column):
@@ -76,11 +74,14 @@ def _to_none_or_date(column):
     return datetime.strptime(column, '%d-%m-%Y').date()
 
 
+"""
+    negeer bekende voorkomens (lege kolom, kolem == '-'
+"""
 def _to_none_or_integer(column):
     if len(column) == 0 or column == '-':
         return None
-    else:
-        return int(column)
+
+    return int(column)
 
 
 def _process_woz_object_row(row):
@@ -88,11 +89,12 @@ def _process_woz_object_row(row):
         pk = row['WOZ_objectnummer']
     except KeyError:
         return None
+
     if pk in _unique_pks:
         log.info(f"ignoring doublure WOZ objectnummer: {pk}")
         return None
-    else:
-        _unique_pks.add(pk)
+
+    _unique_pks.add(pk)
 
     return models.WOZObject(
         woz_objectnummer=pk,
