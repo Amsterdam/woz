@@ -28,21 +28,15 @@ class WaardeView(views.APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         kadastraal_object = request.query_params['kadastraal_object']
-        kadastrale_identificatie = str.split(kadastraal_object)
-
-        try:
-            woz_objecten = self._get_woz_woningen_from(kadastrale_identificatie)
-        except IndexError:
+        kadastrale_identificatie = kadastraal_object.split()
+        if len(kadastrale_identificatie) < 5:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        woz_objecten = self._get_woz_woningen_from(kadastrale_identificatie)
 
         woz_waarden = []
         for woz_object in woz_objecten:
-            waardebeschikkingen = models.WOZWaardeBeschikking.objects.filter(
-                woz_object=woz_object.woz_objectnummer
-            ).extra(order_by = ['begindatum_beschikking_object']).all()
-            waarden = {}
-            for waardebeschikking in waardebeschikkingen:
-                waarden[waardebeschikking.waardepeildatum] = waardebeschikking.vastgestelde_waarde
+            waarden = self._get_latest_waarde_per_peildatum(woz_object)
             output_waarden = {key.year:value for key, value in waarden.items() if key.year in RESTRICTED_YEARS}
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
@@ -52,6 +46,19 @@ class WaardeView(views.APIView):
         response = {'kadastraal_object': kadastraal_object, 'woz_waarden': woz_waarden}
         return Response(response)
 
+    def _get_latest_waarde_per_peildatum(self, woz_object):
+        waarden = {}
+
+        # get all 'waarden' for woz_object, order them by 'begindatum_beschikking_object'
+        waardebeschikkingen = models.WOZWaardeBeschikking.objects.filter(
+            woz_object=woz_object.woz_objectnummer
+        ).extra(order_by=['begindatum_beschikking_object']).all()
+
+        # only keep the last 'waarde' for each 'peildatum' (ordered by 'begindatum_beschikking_object')
+        for waardebeschikking in waardebeschikkingen:
+            waarden[waardebeschikking.waardepeildatum] = waardebeschikking.vastgestelde_waarde
+
+        return waarden
 
     def _get_woz_woningen_from(self, kadastrale_identificatie):
         woz_kadastraal_objecten = models.WOZKadastraalObject.objects.filter(
