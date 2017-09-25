@@ -29,7 +29,7 @@ class WaardeView(views.APIView):
 
         kadastraal_object = request.query_params['kadastraal_object']
         kadastrale_identificatie = kadastraal_object.split()
-        if len(kadastrale_identificatie) < 5:
+        if len(kadastrale_identificatie) != 5:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         woz_objecten = self._get_woz_woningen_from(kadastrale_identificatie)
