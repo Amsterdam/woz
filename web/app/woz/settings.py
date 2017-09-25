@@ -1,5 +1,4 @@
-import os
-from woz.settings_common import INSTALLED_APPS, DEBUG
+from woz.settings_common import *
 from woz.settings_databases import Location_key, \
     get_docker_host, \
     get_database_key, \
