@@ -2,6 +2,8 @@ version: "3.0"
 services:
   database:
     image: build.datapunt.amsterdam.nl:5000/atlas/postgres
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: woz

@@ -2,6 +2,7 @@
 import logging
 
 # Packages
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import views
 from rest_framework.response import Response
 from woz.wozdata import models
@@ -37,7 +38,12 @@ class WaardeView(views.APIView):
         woz_waarden = []
         for woz_object in woz_objecten:
             waarden = self._get_latest_waarde_per_peildatum(woz_object)
-            output_waarden = {key.year:value for key, value in waarden.items() if key.year in RESTRICTED_YEARS}
+            output_waarden = {
+                key.year:value
+                for key, value in waarden.items()
+                    if key.year in RESTRICTED_YEARS
+                    and key >= woz_object.begindatum_voorkomen
+            }
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
                 'waarden': output_waarden
@@ -71,9 +77,13 @@ class WaardeView(views.APIView):
 
         woz_objecten = []
         for woz_kadastraal_object in woz_kadastraal_objecten:
-            woz_object = models.WOZObject.objects.get(
-                woz_objectnummer=woz_kadastraal_object.woz_object_id
-            )
+            try:
+                woz_object = models.WOZObject.objects.get(
+                    woz_objectnummer=woz_kadastraal_object.woz_object_id,
+                    status='GER - Actief: gereed'
+                )
+            except ObjectDoesNotExist as e:
+                continue
             gebruiksdoelen = models.NummeraanduidingGebruiksdoel.objects.values_list(
                 'code', flat=True
             ).filter(

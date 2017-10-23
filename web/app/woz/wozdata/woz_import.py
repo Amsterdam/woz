@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def _get_csv_file(csv_file_identification, data_dir):
     file_pattern = f"{data_dir}/{csv_file_identification}*"
     data_file_candidates = glob.glob(file_pattern)
-    assert len(data_file_candidates) == 1
+    assert len(data_file_candidates) == 1, file_pattern
     return data_file_candidates[0]
 
 
