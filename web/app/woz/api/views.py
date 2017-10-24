@@ -1,6 +1,7 @@
 # Python
 import logging
 import typing as T
+import re
 
 # Packages
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +12,7 @@ from rest_framework import status
 
 GEBRUIKDSOEL_WONING_CODE = '1000'
 RESTRICTED_YEARS = (2014, 2015)
+RE_SOORT_OBJECTCODE = re.compile(r'(\d{4}) - ')
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +47,8 @@ class WaardeView(views.APIView):
                     if key.year in RESTRICTED_YEARS
                     and key >= woz_object.begindatum_voorkomen
             }
-            soort_objectcode = woz_object.soort_objectcode[:4]
+            soort_objectcode_match = RE_SOORT_OBJECTCODE.match(woz_object.soort_objectcode)
+            soort_objectcode = soort_objectcode_match[1] if soort_objectcode else None
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
                 'waarden': output_waarden,
@@ -69,7 +72,7 @@ class WaardeView(views.APIView):
 
         return waarden
 
-    def _get_woz_woningen_from(self, kadastrale_identificatie) -> T.List(models.WOZObject):
+    def _get_woz_woningen_from(self, kadastrale_identificatie) -> T.List[models.WOZObject]:
         woz_kadastraal_objecten = models.WOZKadastraalObject.objects.filter(
             kadastrale_gemeentecode=kadastrale_identificatie[0],
             sectie=kadastrale_identificatie[1],
