@@ -12,7 +12,6 @@ from rest_framework import status
 
 GEBRUIKDSOEL_WONING_CODE = '1000'
 RESTRICTED_YEARS = (2014, 2015)
-RE_SOORT_OBJECTCODE = re.compile(r'(\d{4}) - ')
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +46,8 @@ class WaardeView(views.APIView):
                     if key.year in RESTRICTED_YEARS
                     and key >= woz_object.begindatum_voorkomen
             }
-            soort_objectcode_match = RE_SOORT_OBJECTCODE.match(woz_object.soort_objectcode)
+            # Validate soort_objectcode, and extract first 4 digits:
+            soort_objectcode_match = re.match(r'(\d{4}) - ', woz_object.soort_objectcode)
             soort_objectcode = soort_objectcode_match[1] if soort_objectcode_match else None
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
