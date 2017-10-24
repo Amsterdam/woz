@@ -1,7 +1,8 @@
 #!/bin/sh
 
-set -e
-set -u
+set -e  # Exit on error
+set -u  # Unset variables trigger error
+set -x  # Echo commands
 
 DIR="$(dirname $0)"
 
@@ -9,7 +10,7 @@ dc() {
 	docker-compose -p woz -f ${DIR}/docker-compose.yml $*
 }
 
-trap 'dc kill ; dc rm -f' EXIT
+trap 'dc kill; dc rm -f' EXIT
 
 rm -rf ${DIR}/backups
 mkdir -p ${DIR}/backups

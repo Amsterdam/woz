@@ -77,12 +77,10 @@ class WaardeView(views.APIView):
 
         woz_objecten = []
         for woz_kadastraal_object in woz_kadastraal_objecten:
-            try:
-                woz_object = models.WOZObject.objects.get(
-                    woz_objectnummer=woz_kadastraal_object.woz_object_id,
-                    status='GER - Actief: gereed'
-                )
-            except ObjectDoesNotExist as e:
+            woz_object = models.WOZObject.objects.get(
+                woz_objectnummer=woz_kadastraal_object.woz_object_id
+            )
+            if woz_object.status != 'GER - Actief: gereed':
                 continue
             gebruiksdoelen = models.NummeraanduidingGebruiksdoel.objects.values_list(
                 'code', flat=True
