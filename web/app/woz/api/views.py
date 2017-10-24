@@ -1,5 +1,6 @@
 # Python
 import logging
+import typing as T
 
 # Packages
 from django.core.exceptions import ObjectDoesNotExist
@@ -44,9 +45,11 @@ class WaardeView(views.APIView):
                     if key.year in RESTRICTED_YEARS
                     and key >= woz_object.begindatum_voorkomen
             }
+            soort_objectcode = woz_object.soort_objectcode[:4]
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
-                'waarden': output_waarden
+                'waarden': output_waarden,
+                'soort_objectcode': soort_objectcode
             })
 
         response = {'kadastraal_object': kadastraal_object, 'woz_waarden': woz_waarden}
@@ -66,7 +69,7 @@ class WaardeView(views.APIView):
 
         return waarden
 
-    def _get_woz_woningen_from(self, kadastrale_identificatie):
+    def _get_woz_woningen_from(self, kadastrale_identificatie) -> T.List(models.WOZObject):
         woz_kadastraal_objecten = models.WOZKadastraalObject.objects.filter(
             kadastrale_gemeentecode=kadastrale_identificatie[0],
             sectie=kadastrale_identificatie[1],
