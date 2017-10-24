@@ -48,7 +48,7 @@ class WaardeView(views.APIView):
                     and key >= woz_object.begindatum_voorkomen
             }
             soort_objectcode_match = RE_SOORT_OBJECTCODE.match(woz_object.soort_objectcode)
-            soort_objectcode = soort_objectcode_match[1] if soort_objectcode else None
+            soort_objectcode = soort_objectcode_match[1] if soort_objectcode_match else None
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
                 'waarden': output_waarden,
