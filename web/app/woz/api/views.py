@@ -76,9 +76,9 @@ class WaardeView(views.APIView):
         woz_kadastraal_objecten = models.WOZKadastraalObject.objects.filter(
             kadastrale_gemeentecode=kadastrale_identificatie[0],
             sectie=kadastrale_identificatie[1],
-            perceelnummer=kadastrale_identificatie[2],
+            perceelnummer=kadastrale_identificatie[2].zfill(5),
             indexletter=kadastrale_identificatie[3],
-            indexnummer=kadastrale_identificatie[4],
+            indexnummer=kadastrale_identificatie[4].zfill(4),
         ).all()
 
         woz_objecten = []
