@@ -44,7 +44,7 @@ class WaardeView(views.APIView):
                 key.year:value
                 for key, value in waarden.items()
                     if key.year in RESTRICTED_YEARS
-                    and key >= woz_object.begindatum_voorkomen
+                        #and key >= woz_object.begindatum_voorkomen
             }
             # Validate soort_objectcode, and extract first 4 digits:
             soort_objectcode_match = re.match(r'(\d{4}) - ', woz_object.soort_objectcode)
