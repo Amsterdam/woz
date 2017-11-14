@@ -6,6 +6,9 @@ services:
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: woz
       POSTGRES_USER: woz
+      LOCAL: "True"
+    volumes:
+      - "~/.ssh/datapunt.key:/root/.ssh/datapunt.key"
 
   web:
     build: ./web
