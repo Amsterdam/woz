@@ -1,7 +1,10 @@
 # Python
 import logging
+import typing as T
+import re
 
 # Packages
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import views
 from rest_framework.response import Response
 from woz.wozdata import models
@@ -37,10 +40,19 @@ class WaardeView(views.APIView):
         woz_waarden = []
         for woz_object in woz_objecten:
             waarden = self._get_latest_waarde_per_peildatum(woz_object)
-            output_waarden = {key.year:value for key, value in waarden.items() if key.year in RESTRICTED_YEARS}
+            output_waarden = {
+                key.year:value
+                for key, value in waarden.items()
+                    if key.year in RESTRICTED_YEARS
+                        #and key >= woz_object.begindatum_voorkomen
+            }
+            # Validate soort_objectcode, and extract first 4 digits:
+            soort_objectcode_match = re.match(r'(\d{4}) - ', woz_object.soort_objectcode)
+            soort_objectcode = soort_objectcode_match[1] if soort_objectcode_match else None
             woz_waarden.append({
                 'woz_object': woz_object.woz_objectnummer,
-                'waarden': output_waarden
+                'waarden': output_waarden,
+                'soort_objectcode': soort_objectcode
             })
 
         response = {'kadastraal_object': kadastraal_object, 'woz_waarden': woz_waarden}
@@ -60,13 +72,13 @@ class WaardeView(views.APIView):
 
         return waarden
 
-    def _get_woz_woningen_from(self, kadastrale_identificatie):
+    def _get_woz_woningen_from(self, kadastrale_identificatie) -> T.List[models.WOZObject]:
         woz_kadastraal_objecten = models.WOZKadastraalObject.objects.filter(
             kadastrale_gemeentecode=kadastrale_identificatie[0],
             sectie=kadastrale_identificatie[1],
-            perceelnummer=kadastrale_identificatie[2],
+            perceelnummer=kadastrale_identificatie[2].zfill(5),
             indexletter=kadastrale_identificatie[3],
-            indexnummer=kadastrale_identificatie[4],
+            indexnummer=kadastrale_identificatie[4].zfill(4),
         ).all()
 
         woz_objecten = []
@@ -74,6 +86,8 @@ class WaardeView(views.APIView):
             woz_object = models.WOZObject.objects.get(
                 woz_objectnummer=woz_kadastraal_object.woz_object_id
             )
+            if woz_object.status != 'GER - Actief: gereed':
+                continue
             gebruiksdoelen = models.NummeraanduidingGebruiksdoel.objects.values_list(
                 'code', flat=True
             ).filter(

@@ -18,11 +18,11 @@ def is_table_present():
 
 def fill_referentiedata():
     while True:
-        log.warning(f"waiting for nummeraanduiding_gebruiksdoelen table...")
-        time.sleep(30)
         if is_table_present() is True:
             log.warning(f"done... waiting for nummeraanduiding_gebruiksdoelen table")
             break
+        log.warning(f"waiting for nummeraanduiding_gebruiksdoelen table...")
+        time.sleep(30)
 
     try:
         with connection.cursor() as cursor:

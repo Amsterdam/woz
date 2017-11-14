@@ -1,3 +1,6 @@
 passwords.env
 .idea
 *.iml
+__pycache__
+.venv
+.editorconfig

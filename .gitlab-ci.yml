@@ -35,15 +35,15 @@ deploy_acceptance:
   only:
     - master
 
-deploy_prod:
-  stage: deploy
-  when: manual
-  environment:
-    name: production
-    url: https://api.amsterdam.nl/woz
-
-  image: cdrx/rancher-gitlab-deploy:latest
-  script:
-    - upgrade --stack WozApiStack --service web --new-image ${DEPLOYMENT_IMAGE}
-  only:
-    - master
+#deploy_prod:
+#  stage: deploy
+#  when: manual
+#  environment:
+#    name: production
+#    url: https://api.amsterdam.nl/woz
+#
+#  image: cdrx/rancher-gitlab-deploy:latest
+#  script:
+#    - upgrade --stack WozApiStack --service web --new-image ${DEPLOYMENT_IMAGE}
+#  only:
+#    - master

@@ -29,7 +29,7 @@ DATABASE_OPTIONS = {
         'USER': os.getenv('DATABASE_USER', 'woz'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD', 'insecure'),
         'HOST': get_docker_host(),
-        'PORT': '5459'
+        'PORT': '5432'
     },
     Location_key.override: {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',

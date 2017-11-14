@@ -13,5 +13,5 @@ Wanneer de database is geinstalleerd (check bijvoorbeeld met `docker logs -f woz
 woz docker:
 
 ```bash
-docker-compose up -d --build woz
+docker-compose up -d --build web
 ```
