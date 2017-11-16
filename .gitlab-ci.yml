@@ -4,27 +4,27 @@ stages:
   - deploy
 
 variables:
-  DEPLOYMENT_WEB_IMAGE: ${CI_REGISTRY_IMAGE}web
-  DEPLOYMENT_DB_IMAGE: ${CI_REGISTRY_IMAGE}db
+  DEPLOYMENT_WEB_IMAGE: ${DEPLOYMENT_WEB_IMAGE}
+  DEPLOYMENT_DB_IMAGE: ${DEPLOYMENT_DB_IMAGE}
   DOCKER_DRIVER: overlay
 
 build:
   stage: build
   script:
   - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}web:${CI_COMMIT_SHA:0:8} ./web
-  - docker push ${CI_REGISTRY_IMAGE}web:${CI_COMMIT_SHA:0:8}
-  - docker build --pull -t ${CI_REGISTRY_IMAGE}db:${CI_COMMIT_SHA:0:8} ./database
-  - docker push ${CI_REGISTRY_IMAGE}db:${CI_COMMIT_SHA:0:8}
+  - docker build --pull -t ${DEPLOYMENT_WEB_IMAGE}:${CI_COMMIT_SHA:0:8} ./web
+  - docker push ${DEPLOYMENT_WEB_IMAGE}:${CI_COMMIT_SHA:0:8}
+  - docker build --pull -t ${DEPLOYMENT_DB_IMAGE}:${CI_COMMIT_SHA:0:8} ./database
+  - docker push ${DEPLOYMENT_DB_IMAGE}:${CI_COMMIT_SHA:0:8}
 
 push:
   stage: push
   script:
     - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-    - docker pull ${CI_REGISTRY_IMAGE}web:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}web:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_WEB_IMAGE}:acceptance
-    - docker pull ${CI_REGISTRY_IMAGE}db:${CI_COMMIT_SHA:0:8}
-    - docker tag ${CI_REGISTRY_IMAGE}db:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_DB_IMAGE}:acceptance
+    - docker pull ${DEPLOYMENT_WEB_IMAGE}:${CI_COMMIT_SHA:0:8}
+    - docker tag ${DEPLOYMENT_WEB_IMAGE}:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_WEB_IMAGE}:acceptance
+    - docker pull ${DEPLOYMENT_DB_IMAGE}:${CI_COMMIT_SHA:0:8}
+    - docker tag ${DEPLOYMENT_DB_IMAGE}:${CI_COMMIT_SHA:0:8} ${DEPLOYMENT_DB_IMAGE}:acceptance
     - docker push ${DEPLOYMENT_WEB_IMAGE}:acceptance
     - docker push ${DEPLOYMENT_DB_IMAGE}:acceptance
   only:
