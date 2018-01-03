@@ -24,7 +24,7 @@ services:
               && python manage.py import_woz"
 
   db-backup:
-    image: build.datapunt.amsterdam.nl:5000/atlas/postgres
+    image: amsterdam/postgres
     links:
       - database:db
     volumes:

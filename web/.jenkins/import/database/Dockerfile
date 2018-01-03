@@ -1,5 +1,5 @@
-FROM build.datapunt.amsterdam.nl:5000/atlas/postgres
-MAINTAINER datapunt.ois@amsterdam.nl
+FROM amsterdam/postgres
+MAINTAINER datapunt@amsterdam.nl
 
 # make prepare db script available in postgres docker
 COPY prepare_db.sh /bin/prepare_db.sh

@@ -1,5 +1,5 @@
-FROM amsterdam/docker_python:latest
-MAINTAINER datapunt.ois@amsterdam.nl
+FROM amsterdam/python
+MAINTAINER datapunt@amsterdam.nl
 
 EXPOSE 8000
 
