@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from woz.wozdata import models
 from rest_framework import status
 
-GEBRUIKDSOEL_WONING_CODE = '1000'
 RESTRICTED_YEARS = (2014, 2015)
 
 log = logging.getLogger(__name__)
@@ -93,7 +92,6 @@ class WaardeView(views.APIView):
             ).filter(
                 nummeraanduiding=woz_object.nummeraanduidingidentificatie
             )
-            if GEBRUIKDSOEL_WONING_CODE in gebruiksdoelen:
-                woz_objecten.append(woz_object)
+            woz_objecten.append(woz_object)
 
         return woz_objecten
