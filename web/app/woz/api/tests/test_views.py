@@ -92,4 +92,4 @@ class TestWaardeView(APITestCase):
         response = self.client.get('/woz/waarde/?kadastraal_object=ASD15 S 04639 G 0000')
         self.assertEqual('ASD15 S 04639 G 0000', response.data['kadastraal_object'])
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(0, len(response.data['woz_waarden']))
+        self.assertEqual(1, len(response.data['woz_waarden']))
