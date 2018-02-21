@@ -4,7 +4,6 @@ import typing as T
 import re
 
 # Packages
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import views
 from rest_framework.response import Response
 from woz.wozdata import models
@@ -55,6 +54,10 @@ class WaardeView(views.APIView):
             })
 
         response = {'kadastraal_object': kadastraal_object, 'woz_waarden': woz_waarden}
+        log.debug("Antwoord op verzoek voor %s: %s",
+                  kadastraal_object,
+                  response)
+
         return Response(response)
 
     def _get_latest_waarde_per_peildatum(self, woz_object):

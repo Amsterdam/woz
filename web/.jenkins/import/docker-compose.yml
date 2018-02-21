@@ -36,6 +36,7 @@ services:
                           -Fc \
                           -t wozdata* \
                           -t geo*  \
+                          -t django_content_type  \
                           -t django_migrations  \
                           -T auth*    \
                           -U woz \
