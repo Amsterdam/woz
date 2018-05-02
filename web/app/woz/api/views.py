@@ -90,11 +90,11 @@ class WaardeView(views.APIView):
             )
             if woz_object.status != 'GER - Actief: gereed':
                 continue
-            gebruiksdoelen = models.NummeraanduidingGebruiksdoel.objects.values_list(
-                'code', flat=True
-            ).filter(
-                nummeraanduiding=woz_object.nummeraanduidingidentificatie
-            )
+            # gebruiksdoelen = models.NummeraanduidingGebruiksdoel.objects.values_list(
+            #     'code', flat=True
+            # ).filter(
+            #     nummeraanduiding=woz_object.nummeraanduidingidentificatie
+            # )
             woz_objecten.append(woz_object)
 
         return woz_objecten

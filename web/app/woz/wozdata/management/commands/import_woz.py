@@ -8,6 +8,6 @@ from .. import prerequisites
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        prerequisites.fill_referentiedata()
+        //prerequisites.fill_referentiedata()
         objectstore.fetch_woz_files()
         woz_import.import_woz_files(data_dir=settings.LOCAL_DATA_DIR)
