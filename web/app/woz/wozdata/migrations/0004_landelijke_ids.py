@@ -6,12 +6,13 @@ from django.db import migrations, models
 #
 #
 class Migration(migrations.Migration):
-    pass
-#
-#     dependencies = [
-#         ('wozdata', '0003_nummeraanduidinggebruiksdoel'),
-#     ]
-#
+
+     dependencies = [
+         ('wozdata', '0003_nummeraanduidinggebruiksdoel'),
+     ]
+
+     operations = []
+
 #     operations = [
 #         migrations.AlterField(
 #             model_name='nummeraanduidinggebruiksdoel',

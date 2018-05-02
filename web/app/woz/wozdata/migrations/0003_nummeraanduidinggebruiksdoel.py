@@ -6,12 +6,12 @@ from django.db import migrations, models
 #
 #
 class Migration(migrations.Migration):
-    pass
-#
-#     dependencies = [
-#         ('wozdata', '0002_other_woz_objects'),
-#     ]
-#
+
+     dependencies = [
+         ('wozdata', '0002_other_woz_objects'),
+     ]
+
+     operations = []
 #     operations = [
 #         migrations.CreateModel(
 #             name='NummeraanduidingGebruiksdoel',
