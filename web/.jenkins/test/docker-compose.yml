@@ -17,7 +17,6 @@ services:
       DATABASE_NAME: woz
       DATABASE_USER: woz
       DATABASE_PASSWORD: insecure
-      JWT_SHARED_SECRET_KEY: insecure1234567890
     command: >
       bash -c "/app/.jenkins/docker-wait.sh \
               && cd /app/.jenkins/test/ \
