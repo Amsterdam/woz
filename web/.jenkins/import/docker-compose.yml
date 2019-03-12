@@ -1,13 +1,13 @@
 version: "3.0"
 services:
   database:
-    build: database
+    image: amsterdam/postgres11
     environment:
       POSTGRES_PASSWORD: insecure
       POSTGRES_USER: woz
 
   importer:
-    image: build.datapunt.amsterdam.nl:5000/datapunt/woz:${ENVIRONMENT}
+    image: repo.data.amsterdam.nl/datapunt/woz:${ENVIRONMENT}
     links:
       - database
     environment:
@@ -24,7 +24,7 @@ services:
               && python manage.py import_woz"
 
   db-backup:
-    image: amsterdam/postgres
+    image: amsterdam/postgres11
     links:
       - database:db
     volumes:
