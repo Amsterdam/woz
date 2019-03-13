@@ -5,10 +5,11 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_HOST: localhost
       POSTGRES_PASSWORD: insecure
       POSTGRES_DB: woz
       POSTGRES_USER: woz
+    volumes:
+      - "~/.ssh/datapunt.key:/root/.ssh/datapunt.key"
 
   web:
     build: ./web
