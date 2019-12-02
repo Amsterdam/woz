@@ -3,7 +3,7 @@ import logging
 
 # Packages
 from rest_framework.test import APITestCase
-from woz.wozdata import woz_import, models
+from woz.wozdata import woz_import
 
 log = logging.getLogger(__name__)
 
@@ -13,28 +13,6 @@ class TestWaardeView(APITestCase):
     def setUpClass(cls):
         super().setUpClass()
         woz_import.import_woz_files('/app/data/fixtures')
-
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000248669',
-        #     code='1200').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000248669',
-        #     code='1000').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000490689',
-        #     code='1000').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000452238',
-        #     code='1000').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000162438',
-        #     code='1000').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000137332',
-        #     code='1200').save()
-        # models.NummeraanduidingGebruiksdoel(
-        #     nummeraanduiding='0363200000137332',
-        #     code='1400').save()
 
     def test_get_no_paramater(self):
         response = self.client.get('/woz/waarde/')

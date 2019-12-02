@@ -9,16 +9,11 @@ checks:
    check filename changes
      - we do not work of old files because new files are renamed
 
-We download specific zip files:
-
-Unzip target data in to empty new location
 """
 import logging
 import os
-import zipfile
 
 from functools import lru_cache
-from pathlib import Path
 from dateutil import parser
 
 from swiftclient.client import Connection
@@ -30,13 +25,13 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("swiftclient").setLevel(logging.WARNING)
 
-CONTAINER = 'Diva'
-ZIP_FOLDER = 'Zip_bestanden/'
+CONTAINER = os.getenv('GOB_OBJECTSTORE_ENV', 'productie')
+WOZ_FOLDER = 'woz/CVS/'
 
 os_connect = {
     'auth_version': '2.0',
     'authurl': 'https://identity.stack.cloudvps.com/v2.0',
-    'user': 'bag_brk',
+    'user': 'GOB_user',
     'key': settings.OBJECTSTORE_PASSWORD,
     'tenant_name': settings.OBJECTSTORE_TENNANT,
     'os_options': {
@@ -48,7 +43,7 @@ os_connect = {
 
 @lru_cache(maxsize=None)
 def get_conn():
-    assert os.getenv('BAG_OBJECTSTORE_PASSWORD')
+    assert os.getenv('GOB_OBJECTSTORE_PASSWORD')
     return Connection(**os_connect)
 
 
@@ -75,9 +70,9 @@ def get_full_container_list(container_name, **kwargs):
     return seed
 
 
-def download_diva_file(container_name, file_path):
+def download_file(container_name, file_path):
     """
-    Download a diva file
+    Download a  file
     :param container_name:
     :param file_path:
     :return:
@@ -98,15 +93,15 @@ def download_diva_file(container_name, file_path):
         newfile.write(zipdata)
 
 
-def download_zips(container_name, zips_mapper):
+def download_files(container_name, files_map):
     """
-    Download latest zips
+    Download latest files
     """
 
-    for _, zipfiles in zips_mapper.items():
-        zipfiles.sort(reverse=True)
-        zip_name = zipfiles[0][1]['name']
-        download_diva_file(container_name, zip_name)
+    for _, file in files_map.items():
+        file.sort(reverse=True)
+        file_name = file[0][1]['name']
+        download_file(container_name, file_name)
 
 
 def unzip_files(zipsource):
@@ -121,21 +116,6 @@ def unzip_files(zipsource):
         zipsource.extract(fullname, directory)
 
 
-def unzip_data(zips_mapper):
-    """
-    unzip the zips
-    """
-
-    for _zipkey, zipfiles in zips_mapper.items():
-        latestzip = zipfiles[0][1]
-        filepath = latestzip['name'].split('/')
-        file_name = filepath[-1]
-        zip_path = '{}/{}'.format(settings.LOCAL_DATA_DIR, file_name)
-        log.info(f"Unzip {zip_path}")
-        zipsource = zipfile.ZipFile(zip_path, 'r')
-        unzip_files(zipsource)
-
-
 def delete_from_objectstore(container, object_name):
     """
     remove file `object_name` fronm `container`
@@ -146,45 +126,44 @@ def delete_from_objectstore(container, object_name):
     return get_conn().delete_object(container, object_name)
 
 
-def delete_old_zips(container_name, zips_mapper):
+def delete_old_files(container_name, files_map):
     """
-    Cleanup old zips
+    Cleanup old fo;es
     """
-    for _zipkey, zipfiles in zips_mapper.items():
-        log.debug('KEEP : %s', zipfiles[0][1]['name'])
-        if len(zipfiles) > 1:
+    for _, file in files_map.items():
+        log.debug('KEEP : %s', file[0][1]['name'])
+        if len(file) > 1:
             # delete old files
-            for _, zipobject in zipfiles[1:]:
-                zippath = zipobject['name']
-                log.debug('PURGE: %s', zippath)
-                delete_from_objectstore(container_name, zippath)
+            for _, file_object in file[1:]:
+                filepath = file_object['name']
+                log.debug('PURGE: %s', filepath)
+                delete_from_objectstore(container_name, filepath)
 
 
-def get_woz_zip(container_name=CONTAINER, zipfolder=ZIP_FOLDER):
+def get_woz_files(container_name=CONTAINER, wozfolder=WOZ_FOLDER):
     """
     fetch files from folder in an objectstore container
     :param container_name:
     :param folder:
     :return:
     """
-    log.info(f"find woz file from {zipfolder}")
-    zips_mapper = {}
+    log.info(f"find woz file from {wozfolder}")
+    files_map = {}
 
-    for file_object in get_full_container_list(container_name, prefix=zipfolder):
+    for file_object in get_full_container_list(container_name, prefix=wozfolder):
         if file_object['content_type'] == 'application/directory':
             continue
 
         path = file_object['name'].split('/')
         file_name = path[-1]
 
-        if file_name.endswith('_WOZ.zip'):
+        if file_name.endswith('.csv'):
             dt = parser.parse(file_object['last_modified'])
             file_key = "".join(file_name.split('_')[1:])
-            zips_mapper.setdefault(file_key, []).append((dt, file_object))
+            files_map.setdefault(file_key, []).append((dt, file_object))
 
-    download_zips(container_name, zips_mapper)
-    delete_old_zips(container_name, zips_mapper)
-    unzip_data(zips_mapper)
+    download_files(container_name, files_map)
+    delete_old_files(container_name, files_map)
 
 
 def fetch_woz_files():
@@ -197,4 +176,4 @@ def fetch_woz_files():
     if not os.path.exists(settings.LOCAL_DATA_DIR):
         os.makedirs(settings.LOCAL_DATA_DIR)
     # download and unpack the zip files
-    get_woz_zip()
+    get_woz_files()
