@@ -26,7 +26,7 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("swiftclient").setLevel(logging.WARNING)
 
 CONTAINER = os.getenv('GOB_OBJECTSTORE_ENV', 'productie')
-WOZ_FOLDER = 'woz/CVS/'
+WOZ_FOLDER = 'woz/CSV/'
 
 os_connect = {
     'auth_version': '2.0',
