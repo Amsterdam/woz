@@ -22,17 +22,6 @@ node {
         checkout scm
     }
 
-//    stage('Test') {
-//        tryStep "test", {
-//
-//            sh "docker-compose -p woz -f web/.jenkins/test/docker-compose.yml build && " +
-//                    "docker-compose -p woz -f web/.jenkins/test/docker-compose.yml run -u root --rm tests"
-//
-//        }, {
-//            sh "docker-compose -p woz -f web/.jenkins/test/docker-compose.yml down"
-//        }
-//    }
-
     stage("Build image") {
         tryStep "build", {
                 docker.withRegistry("${DOCKER_REGISTRY_HOST}",'docker_registry_auth') {
