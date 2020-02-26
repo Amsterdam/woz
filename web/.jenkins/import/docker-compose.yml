@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: woz
 
   importer:
-    image: docker-registry.data.amsterdam.nl/datapunt/woz:${ENVIRONMENT}
+    image: ${DOCKER_REGISTRY_HOST}/datapunt/woz:${ENVIRONMENT}
     links:
       - database
     environment:
